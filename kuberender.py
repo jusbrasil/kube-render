@@ -14,8 +14,8 @@ import jinja2
 RenderedTemplate = collections.namedtuple('RenderedTemplate', ['slug', 'content'])
 
 def save_rendered_templates(rendered_templates, output_dir):
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+    shutil.rmtree(output_dir, ignore_errors=True)
+    os.makedirs(output_dir)
     for t in rendered_templates:
         with tempfile.NamedTemporaryFile(prefix='rendered', suffix=t.slug, dir=output_dir, delete=False) as temp:
             temp.write(t.content)
