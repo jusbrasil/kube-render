@@ -1,9 +1,17 @@
 ## Kube-render
 
-A tool that renders Kubernetes (k8s) templates into Manifests.
+A POC tool for rendering Kubernetes (k8s) templates into Manifests.
+It supports most of [Helm](https://github.com/kubernetes/helm) rendering features.
 
-Just pip-install it and run with kube-render.
-Once you install it, you can use kube-render --help, which will output its usage, as in:
+The idea behind this project is to provide a simple mechanism of rendering Manifests.
+It might be helpful when you can't or don't want to use Helm, but want some help with a more "complex" set of rendering features.
+
+It's not on Pypi yet. If you want to install it in dev mode, you can clone the repo and install with:
+```
+pip install --editable .
+```
+
+Once you install it, you can use `kube-render --help`, which will output its usage, as in:
 
 ```
 $ kube-render --help
@@ -22,7 +30,19 @@ Options:
   --help                   Show this message and exit.
 ```
 
-No tests yet.. but if you wanna try, go to examples folder and run something like
+It's just a POC and there are no tests yet.. but if you wanna try, go to examples folder and run something like
 ```
-kube-render -t example/templates/ -c example/context_base.yaml  -c example/context_override.yaml --set x=y --set y=z -v --set y=got_overriden
+$ kube-render -t example/templates/ -c example/context_base.yaml  -c example/context_override.yaml --set root.something.c=whatsup -v
+
+### Computed variables:root:
+  something:
+    a: hello
+    b: man
+    c: whatsup
+
+### Rendered deployment.yaml
+a: hello
+b: man
+c: whatsup
 ```
+

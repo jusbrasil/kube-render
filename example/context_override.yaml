@@ -1,4 +1,5 @@
 root:
   something:
+    a: hello
     b: man
     c: cool
