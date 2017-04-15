@@ -72,8 +72,10 @@ def run(verbose, template_dir, no_save, should_apply, context_files, output_dir,
     rendered_templates = render_templates(template_dir, **context)
 
     if verbose:
+        sys.stdout.write('### Computed variables:')
+        sys.stdout.write(yaml.dump(context, default_flow_style=False, indent=2))
         for t in rendered_templates:
-            sys.stdout.write('### {}\n'.format(t.slug))
+            sys.stdout.write('\n### Rendered {}\n'.format(t.slug))
             sys.stdout.write(t.content)
             sys.stdout.write('\n')
 
