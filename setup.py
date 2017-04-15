@@ -1,6 +1,6 @@
 from setuptools import setup
 
-__version__ = '0.1.3'
+__version__ = '0.1.4'
 
 setup(
     name='kuberender',
