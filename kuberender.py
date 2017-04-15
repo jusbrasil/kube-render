@@ -22,19 +22,10 @@ def save_rendered_templates(rendered_templates, output_dir):
             temp.flush()
 
 
-def deep_merge(dct, merge_dct):
-    for k, v in merge_dct.items():
-        if (k in dct and isinstance(dct[k], dict)
-                and isinstance(merge_dct[k], collections.Mapping)):
-            deep_merge(dct[k], merge_dct[k])
-        else:
-            dct[k] = merge_dct[k]
-
-
 def merge_dicts(dicts):
     merged = {}
     for d in dicts:
-        deep_merge(merged, d)
+        dpath.util.merge(merged, d)
     return merged
 
 
