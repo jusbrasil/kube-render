@@ -1,0 +1,4 @@
+first_key: {{ root.something.a }}
+second_key: {{ root.something.b }}
+third_key: {{ root.something.c }}
+y: {{y}}
