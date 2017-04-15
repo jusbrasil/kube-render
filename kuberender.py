@@ -5,6 +5,7 @@ import collections
 from subprocess import call
 import tempfile
 import shutil
+import dpath
 
 import yaml
 import click
@@ -55,6 +56,15 @@ def load_yaml_file(path):
         return yaml.load(f.read())
 
 
+def parse_overriden_vars(overriden_vars):
+    def parse_statement(override_statement):
+        key, value = override_statement.split('=')
+        obj = {}
+        dpath.util.new(obj, key.replace('.', '/'), value)
+        return obj
+    return list(map(parse_statement, overriden_vars))
+
+
 @click.command()
 @click.option('--verbose', '-v', default=False, is_flag=True, help='Whether it should print generated files or not')
 @click.option('--context', '-c', 'context_files', help="Yaml file path to be loaded into context. Supports merging.", multiple=True)
@@ -66,8 +76,8 @@ def load_yaml_file(path):
 def run(verbose, template_dir, no_save, should_apply, context_files, output_dir, overriden_vars):
     context_data = map(load_yaml_file, context_files)
 
-    overriden_vars = dict([kv.split('=') for kv in overriden_vars])
-    context = merge_dicts(context_data + [overriden_vars])
+    overriden_vars = parse_overriden_vars(overriden_vars)
+    context = merge_dicts(context_data + overriden_vars)
     rendered_templates = render_templates(template_dir, **context)
 
     if verbose:

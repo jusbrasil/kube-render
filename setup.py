@@ -10,6 +10,7 @@ setup(
       'Jinja2==2.9.6',
       'click==6.7',
       'PyYAML==3.12',
+      'dpath==1.4.0',
     ],
     entry_points='''
         [console_scripts]
