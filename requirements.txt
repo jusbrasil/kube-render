@@ -1,3 +1,0 @@
-Jinja2==2.9.6
-click==6.7
-PyYAML==3.12
