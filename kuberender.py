@@ -1,17 +1,17 @@
-import os
-import sys
-import copy
 import collections
-from subprocess import call
-import tempfile
+import os
 import shutil
-import dpath
+import sys
+import tempfile
+from subprocess import call
 
-import yaml
 import click
+import dpath
 import jinja2
+import yaml
 
 RenderedTemplate = collections.namedtuple('RenderedTemplate', ['slug', 'content'])
+
 
 def save_rendered_templates(rendered_templates, output_dir):
     shutil.rmtree(output_dir, ignore_errors=True)
@@ -32,14 +32,13 @@ def merge_dicts(dicts):
 def render_templates(template_dir, **context):
     loader = jinja2.FileSystemLoader('.')
     env = jinja2.Environment(loader=loader)
-    return map(
-        lambda filename: RenderedTemplate(
-            filename,
-            env.get_template(os.path.join(template_dir, filename)).render(
-                yaml=yaml,
-                **context)),
-        os.listdir(template_dir)
-    )
+
+    def render(filename):
+        template = env.get_template(os.path.join(template_dir, filename))
+        rendered = template.render(yaml=yaml, **context)
+        return RenderedTemplate(filename, rendered)
+
+    return map(render, os.listdir(template_dir))
 
 
 def load_yaml_file(path):
@@ -53,6 +52,7 @@ def parse_overriden_vars(overriden_vars):
         obj = {}
         dpath.util.new(obj, key.replace('.', '/'), value)
         return obj
+
     return list(map(parse_statement, overriden_vars))
 
 
