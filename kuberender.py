@@ -32,14 +32,13 @@ def merge_dicts(dicts):
 def render_templates(template_dir, **context):
     loader = jinja2.FileSystemLoader('.')
     env = jinja2.Environment(loader=loader)
-    return map(
-        lambda filename: RenderedTemplate(
-            filename,
-            env.get_template(os.path.join(template_dir, filename)).render(
-                yaml=yaml,
-                **context)),
-        os.listdir(template_dir)
-    )
+
+    def render(filename):
+        template = env.get_template(os.path.join(template_dir, filename))
+        rendered = template.render(yaml=yaml, **context)
+        return RenderedTemplate(filename, rendered)
+
+    return map(render, os.listdir(template_dir))
 
 
 def load_yaml_file(path):
