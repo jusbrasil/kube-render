@@ -17,6 +17,9 @@ def save_rendered_templates(rendered_templates, output_dir):
     shutil.rmtree(output_dir, ignore_errors=True)
     os.makedirs(output_dir)
     for t in rendered_templates:
+        if not (yaml.load(t.content) or {}).get('Kind'):
+            sys.stdout.write('### {} is invalid. Ignoring..\n'.format(t.slug))
+            continue
         with tempfile.NamedTemporaryFile(prefix='rendered', suffix=t.slug, dir=output_dir, delete=False) as temp:
             temp.write(t.content)
             temp.flush()

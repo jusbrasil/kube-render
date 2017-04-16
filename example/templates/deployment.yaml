@@ -1,3 +1,6 @@
+{% if kind %}
+Kind: {{ kind }}
+{% endif %}
 a: {{ root.something.a }}
 b: {{ root.something.b }}
 c: {{ root.something.c }}
