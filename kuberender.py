@@ -1,17 +1,17 @@
-import os
-import sys
-import copy
 import collections
-from subprocess import call
-import tempfile
+import os
 import shutil
-import dpath
+import sys
+import tempfile
+from subprocess import call
 
-import yaml
 import click
+import dpath
 import jinja2
+import yaml
 
 RenderedTemplate = collections.namedtuple('RenderedTemplate', ['slug', 'content'])
+
 
 def save_rendered_templates(rendered_templates, output_dir):
     shutil.rmtree(output_dir, ignore_errors=True)
@@ -53,6 +53,7 @@ def parse_overriden_vars(overriden_vars):
         obj = {}
         dpath.util.new(obj, key.replace('.', '/'), value)
         return obj
+
     return list(map(parse_statement, overriden_vars))
 
 
