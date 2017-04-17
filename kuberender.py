@@ -35,6 +35,7 @@ def merge_dicts(dicts):
 def render_templates(template_dir, **context):
     loader = jinja2.FileSystemLoader('.')
     env = jinja2.Environment(loader=loader)
+    env.filters['dump'] = lambda o: yaml.dump(o, default_flow_style=False)
 
     def render(filename):
         template = env.get_template(os.path.join(template_dir, filename))
