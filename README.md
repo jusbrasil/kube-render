@@ -24,8 +24,6 @@ Options:
                            merging.
   -s, --set TEXT           Vars that override context files. Format: key=value
   -t, --template-dir TEXT  Folder holding templates that should be rendered
-  -o, --output-dir TEXT    Folder that rendered templates should be put in
-  --no-save                Only prints templates. Doesn't create files
   -A, --apply              Apply rendered files using `kubectl apply`
   --help                   Show this message and exit.
 ```
