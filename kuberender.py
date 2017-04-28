@@ -50,9 +50,12 @@ def create_kubectl_apply_pipe():
     return Popen(['kubectl', 'apply', '-f', '-'], stdin=PIPE)
 
 
-def call_kubectl_apply(rendered_template):
+def call_kubectl_apply(t):
+    if not (yaml.load(t.content) or {}).get('kind'):
+        sys.stdout.write('### {} is invalid. Ignoring..\n'.format(t.slug))
+        return
     pipe = create_kubectl_apply_pipe()
-    pipe.communicate(rendered_template.content)
+    pipe.communicate(t.content)
 
 
 @click.command()
