@@ -1,9 +1,7 @@
 import collections
 import os
-import shutil
 import sys
-import tempfile
-from subprocess import call
+from subprocess import Popen, PIPE
 
 import click
 import dpath
@@ -11,18 +9,6 @@ import jinja2
 import yaml
 
 RenderedTemplate = collections.namedtuple('RenderedTemplate', ['slug', 'content'])
-
-
-def save_rendered_templates(rendered_templates, output_dir):
-    shutil.rmtree(output_dir, ignore_errors=True)
-    os.makedirs(output_dir)
-    for t in rendered_templates:
-        if not (yaml.load(t.content) or {}).get('kind'):
-            sys.stdout.write('### {} is invalid. Ignoring..\n'.format(t.slug))
-            continue
-        with tempfile.NamedTemporaryFile(prefix='rendered', suffix=t.slug, dir=output_dir, delete=False) as temp:
-            temp.write(t.content)
-            temp.flush()
 
 
 def merge_dicts(dicts):
@@ -60,15 +46,22 @@ def parse_overriden_vars(overriden_vars):
     return list(map(parse_statement, overriden_vars))
 
 
+def create_kubectl_apply_pipe():
+    return Popen(['kubectl', 'apply', '-f', '-'], stdin=PIPE)
+
+
+def call_kubectl_apply(rendered_template):
+    pipe = create_kubectl_apply_pipe()
+    pipe.communicate(rendered_template.content)
+
+
 @click.command()
 @click.option('--verbose', '-v', default=False, is_flag=True, help='Whether it should print generated files or not')
 @click.option('--context', '-c', 'context_files', help="Yaml file path to be loaded into context. Supports merging.", multiple=True)
 @click.option('--set', '-s', 'overriden_vars', help="Vars that override context files. Format: key=value", multiple=True)
 @click.option('--template-dir', '-t', default='templates', help='Folder holding templates that should be rendered')
-@click.option('--output-dir', '-o', default='gen', help='Folder that rendered templates should be put in')
-@click.option('--no-save', default=False, is_flag=True, help="Only prints templates. Doesn't create files")
 @click.option('--apply', '-A', 'should_apply', default=False, is_flag=True, help="Apply rendered files using `kubectl apply`")
-def run(verbose, template_dir, no_save, should_apply, context_files, output_dir, overriden_vars):
+def run(verbose, template_dir, should_apply, context_files, overriden_vars):
     context_data = map(load_yaml_file, context_files)
 
     overriden_vars = parse_overriden_vars(overriden_vars)
@@ -83,10 +76,8 @@ def run(verbose, template_dir, no_save, should_apply, context_files, output_dir,
             sys.stdout.write(t.content)
             sys.stdout.write('\n')
 
-    if not no_save:
-        save_rendered_templates(rendered_templates, output_dir)
-        if should_apply:
-            call(['kubectl', 'apply', '-f', output_dir])
+    if should_apply:
+        map(call_kubectl_apply, rendered_templates)
 
 
 if __name__ == '__main__':
