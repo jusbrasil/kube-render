@@ -14,8 +14,6 @@ pip install --editable .
 Once you install it, you can use `kube-render --help`, which will output its usage, as in:
 
 ```
-$ kube-render --help
-
 Usage: kube-render [OPTIONS]
 
 Options:
@@ -24,6 +22,8 @@ Options:
                            merging.
   -s, --set TEXT           Vars that override context files. Format: key=value
   -t, --template-dir TEXT  Folder holding templates that should be rendered
+  -u, --template-url TEXT  URL to download templates from (writes on ~/.kube-
+                           render/templates). Accepts URLs on pip format
   -A, --apply              Apply rendered files using `kubectl apply`
   --help                   Show this message and exit.
 ```

@@ -1,5 +1,6 @@
 import collections
 import os
+from os.path import expanduser
 import sys
 from subprocess import Popen, PIPE
 
@@ -7,6 +8,7 @@ import click
 import dpath
 import jinja2
 import yaml
+from libvcs.shortcuts import create_repo_from_pip_url
 
 RenderedTemplate = collections.namedtuple('RenderedTemplate', ['slug', 'content'])
 
@@ -22,12 +24,13 @@ def should_render_template(template_path):
     return not (filename.startswith('.') or filename.startswith('_'))
 
 def render_templates(template_dir, **context):
-    loader = jinja2.FileSystemLoader('.')
+    loader = jinja2.FileSystemLoader(['.', template_dir])
     env = jinja2.Environment(loader=loader)
     env.filters['dump'] = lambda o: yaml.dump(o, default_flow_style=False)
 
     def render(filename):
-        template = env.get_template(os.path.join(template_dir, filename))
+        template = env.get_template(filename)
+
         rendered = template.render(yaml=yaml, **context)
         return RenderedTemplate(filename, rendered)
     return map(render, filter(should_render_template, os.listdir(template_dir)))
@@ -52,12 +55,15 @@ def create_kubectl_apply_pipe():
     return Popen(['kubectl', 'apply', '-f', '-'], stdin=PIPE)
 
 
-def call_kubectl_apply(t):
-    if not (yaml.load(t.content) or {}).get('kind'):
-        sys.stdout.write('### {} is invalid. Ignoring..\n'.format(t.slug))
+def call_kubectl_apply(template):
+    if not (yaml.load(template.content) or {}).get('kind'):
         return
     pipe = create_kubectl_apply_pipe()
-    pipe.communicate(t.content)
+    pipe.communicate(template.content)
+
+def update_templates(template_url, dump_dir):
+    repo = create_repo_from_pip_url(pip_url=template_url, repo_dir=dump_dir)
+    repo.update_repo()
 
 
 @click.command()
@@ -65,12 +71,18 @@ def call_kubectl_apply(t):
 @click.option('--context', '-c', 'context_files', help="Yaml file path to be loaded into context. Supports merging.", multiple=True)
 @click.option('--set', '-s', 'overriden_vars', help="Vars that override context files. Format: key=value", multiple=True)
 @click.option('--template-dir', '-t', default='templates', help='Folder holding templates that should be rendered')
+@click.option('--template-url', '-u', default=None, help='URL to download templates from (writes on ~/.kube-render/templates). Accepts URLs on pip format')
 @click.option('--apply', '-A', 'should_apply', default=False, is_flag=True, help="Apply rendered files using `kubectl apply`")
-def run(verbose, template_dir, should_apply, context_files, overriden_vars):
+def run(verbose, template_dir, should_apply, context_files, overriden_vars, template_url):
     context_data = map(load_yaml_file, context_files)
 
     overriden_vars = parse_overriden_vars(overriden_vars)
     context = merge_dicts(context_data + overriden_vars)
+
+    if template_url is not None:
+        template_dir = os.path.join(expanduser("~"), '.kube-render/templates')
+        update_templates(template_url, template_dir)
+
     rendered_templates = render_templates(template_dir, **context)
 
     if verbose:
