@@ -17,6 +17,9 @@ def merge_dicts(dicts):
         dpath.util.merge(merged, d)
     return merged
 
+def should_render_template(template_path):
+    filename = template_path.split('/')[-1]
+    return not (filename.startswith('.') or filename.startswith('_'))
 
 def render_templates(template_dir, **context):
     loader = jinja2.FileSystemLoader('.')
@@ -27,8 +30,7 @@ def render_templates(template_dir, **context):
         template = env.get_template(os.path.join(template_dir, filename))
         rendered = template.render(yaml=yaml, **context)
         return RenderedTemplate(filename, rendered)
-
-    return map(render, os.listdir(template_dir))
+    return map(render, filter(should_render_template, os.listdir(template_dir)))
 
 
 def load_yaml_file(path):
