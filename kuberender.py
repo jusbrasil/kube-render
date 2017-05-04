@@ -83,7 +83,3 @@ def run(verbose, template_dir, should_apply, context_files, overriden_vars):
 
     if should_apply:
         map(call_kubectl_apply, rendered_templates)
-
-
-if __name__ == '__main__':
-    run()
