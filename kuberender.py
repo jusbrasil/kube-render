@@ -1,8 +1,8 @@
 import collections
 import os
-import sys
 from os.path import expanduser
-from subprocess import PIPE, Popen
+import sys
+from subprocess import Popen, PIPE
 
 import click
 import dpath
@@ -26,7 +26,6 @@ def should_render_template(template_path):
 
 
 def render_templates(template_dir, work_dir, **context):
-    print work_dir
     loader = jinja2.FileSystemLoader([work_dir, template_dir])
     env = jinja2.Environment(loader=loader)
     env.filters['dump'] = lambda o: yaml.dump(o, default_flow_style=False)
