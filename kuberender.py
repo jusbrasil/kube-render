@@ -25,8 +25,8 @@ def should_render_template(template_path):
     return not (filename.startswith('.') or filename.startswith('_'))
 
 
-def render_templates(template_dir, work_dir, **context):
-    loader = jinja2.FileSystemLoader([work_dir, template_dir])
+def render_templates(template_dir, working_dir, **context):
+    loader = jinja2.FileSystemLoader([working_dir, template_dir])
     env = jinja2.Environment(loader=loader)
     env.filters['dump'] = lambda o: yaml.dump(o, default_flow_style=False)
 
@@ -76,8 +76,8 @@ def update_templates(template_url, dump_dir):
 @click.option('--template-dir', '-t', default='templates', help='Folder holding templates that should be rendered')
 @click.option('--template-url', '-u', default=None, help='URL to download templates from (writes on ~/.kube-render/templates). Accepts URLs on pip format')
 @click.option('--apply', '-A', 'should_apply', default=False, is_flag=True, help="Apply rendered files using `kubectl apply`")
-@click.option('--work-dir', '-w', default='.', help="Directory where jinja will find all files")
-def run(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, work_dir):
+@click.option('--working-dir', '-w', default='.', help="Directory where jinja will find all files")
+def run(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir):
     context_data = map(load_yaml_file, context_files)
 
     overriden_vars = parse_overriden_vars(overriden_vars)
@@ -87,7 +87,7 @@ def run(verbose, template_dir, should_apply, context_files, overriden_vars, temp
         template_dir = os.path.join(expanduser("~"), '.kube-render/templates')
         update_templates(template_url, template_dir)
 
-    rendered_templates = render_templates(template_dir, work_dir, **context)
+    rendered_templates = render_templates(template_dir, working_dir, **context)
 
     if verbose:
         sys.stdout.write('### Computed variables:')
