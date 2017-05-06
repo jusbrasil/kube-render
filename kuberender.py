@@ -1,8 +1,8 @@
 import collections
 import os
-from os.path import expanduser
 import sys
-from subprocess import Popen, PIPE
+from os.path import expanduser
+from subprocess import PIPE, Popen
 
 import click
 import dpath
@@ -19,9 +19,11 @@ def merge_dicts(dicts):
         dpath.util.merge(merged, d)
     return merged
 
+
 def should_render_template(template_path):
     filename = template_path.split('/')[-1]
     return not (filename.startswith('.') or filename.startswith('_'))
+
 
 def render_templates(template_dir, work_dir, **context):
     print work_dir
@@ -61,6 +63,7 @@ def call_kubectl_apply(template):
         return
     pipe = create_kubectl_apply_pipe()
     pipe.communicate(template.content)
+
 
 def update_templates(template_url, dump_dir):
     repo = create_repo_from_pip_url(pip_url=template_url, repo_dir=dump_dir)
