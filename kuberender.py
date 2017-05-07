@@ -48,7 +48,7 @@ def parse_overriden_vars(overriden_vars):
     def parse_statement(override_statement):
         key, value = override_statement.split('=')
         obj = {}
-        dpath.util.new(obj, key.replace('.', '/'), value)
+        dpath.util.new(obj, key, value, separator='.')
         return obj
 
     return list(map(parse_statement, overriden_vars))
