@@ -1,0 +1,10 @@
+replicaCount: 1
+instance_name: "news-page-cache"
+image:
+  repository: redis
+  tag: latest
+  pullPolicy: Always
+resources:
+  limits:
+    memory: "32M"
+    cpu: 0.3

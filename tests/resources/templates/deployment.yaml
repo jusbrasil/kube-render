@@ -1,0 +1,24 @@
+{% set NAME = 'redis-' + instance_name -%}
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ NAME }}
+  labels:
+    name: {{ APP_NAME }}
+    service: redis
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: {{ APP_NAME }}
+        service: redis
+    spec:
+      containers:
+      - name: {{NAME}}
+        image: "{{image.repository}}:{{image.tag}}"
+        imagePullPolicy: {{ image.pullPolicy }}
+        resources:
+          limits:
+            memory: "{{resources.limits.memory}}"
+            cpu: {{resources.limits.cpu}}
