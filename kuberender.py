@@ -85,7 +85,7 @@ def render(verbose, template_dir, should_apply, context_files, overriden_vars, t
     rendered_templates = render_templates(template_dir, working_dir, **context)
 
     if verbose:
-        sys.stdout.write('### Computed variables:')
+        sys.stdout.write('### Computed context:\n')
         sys.stdout.write(yaml.safe_dump(context, default_flow_style=False, indent=2))
         for t in rendered_templates:
             sys.stdout.write('\n### Rendered {}\n'.format(t.slug))
@@ -104,6 +104,6 @@ def render(verbose, template_dir, should_apply, context_files, overriden_vars, t
 @click.option('--template-dir', '-t', default='templates', help='Folder holding templates that should be rendered')
 @click.option('--template-url', '-u', default=None, help='URL to download templates from (writes on ~/.kube-render/templates). Accepts URLs on pip format')
 @click.option('--apply', '-A', 'should_apply', default=False, is_flag=True, help="Apply rendered files using `kubectl apply`")
-@click.option('--working-dir', '-w', default='.', help="Directory where jinja will find all files")
+@click.option('--working-dir', '-w', default='.', help="Base directory for loading templates and context files")
 def run(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir):
     return render(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir)

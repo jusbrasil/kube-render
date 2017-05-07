@@ -1,14 +1,14 @@
 ## Kube-render
 
-A POC tool for rendering Kubernetes (k8s) templates into Manifests.
+A tool for rendering Kubernetes (k8s) templates into Manifests.
 It supports most of [Helm](https://github.com/kubernetes/helm) rendering features.
 
 The idea behind this project is to provide a simple mechanism of rendering Manifests.
 It might be helpful when you can't or don't want to use Helm, but want some help with a more "complex" set of rendering features.
 
-It's not on Pypi yet. If you want to install it in dev mode, you can clone the repo and install with:
+To install it, use:
 ```
-pip install --editable .
+pip install kuberender
 ```
 
 Once you install it, you can use `kube-render --help`, which will output its usage, as in:
@@ -25,22 +25,56 @@ Options:
   -u, --template-url TEXT  URL to download templates from (writes on ~/.kube-
                            render/templates). Accepts URLs on pip format
   -A, --apply              Apply rendered files using `kubectl apply`
+  -w, --working-dir TEXT   Base directory for loading templates and context
+                           files
   --help                   Show this message and exit.
 ```
 
-It's just a POC and there are no tests yet.. but if you wanna try, go to examples folder and run something like
+You can find usage examples by looking at the tests, but a sample render looks like this:
 ```
-$ kube-render -t example/templates/ -c example/context_base.yaml  -c example/context_override.yaml --set root.something.c=whatsup -v
+$ kube-render -w tests/resources -c base.yaml  -c extended.yaml --set image.tag=3.0.7 -v
+```
 
-### Computed variables:root:
-  something:
-    a: hello
-    b: man
-    c: whatsup
+As it's in the verbose mode, it will show the computed context and the generated manifest:
+```
+### Computed context:
+image:
+  pullPolicy: Always
+  repository: redis
+  tag: 3.0.7
+instance_name: news-page-cache
+replicaCount: 1
+resources:
+  limits:
+    cpu: 0.3
+    memory: 64M
 
 ### Rendered deployment.yaml
-a: hello
-b: man
-c: whatsup
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: redis-news-page-cache
+  labels:
+    name:
+    service: redis
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name:
+        service: redis
+    spec:
+      containers:
+      - name: redis-news-page-cache
+        image: "redis:3.0.7"
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: "64M"
+            cpu: 0.3
 ```
+
+If you want to use the generated manifest and upload it, include the parameter -A (or --apply).
+Basically, what it does, is to call `$ kubectl apply` with a subprocess call.
 
