@@ -103,3 +103,4 @@ def run(verbose, template_dir, should_apply, context_files, overriden_vars, temp
 
     if should_apply:
         map(call_kubectl_apply, rendered_templates)
+    return rendered_templates
