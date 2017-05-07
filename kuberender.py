@@ -3,6 +3,7 @@ import os
 from os.path import expanduser
 import sys
 from subprocess import Popen, PIPE
+from functools import partial
 
 import click
 import dpath
@@ -78,7 +79,8 @@ def update_templates(template_url, dump_dir):
 @click.option('--apply', '-A', 'should_apply', default=False, is_flag=True, help="Apply rendered files using `kubectl apply`")
 @click.option('--working-dir', '-w', default='.', help="Directory where jinja will find all files")
 def run(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir):
-    context_data = map(load_yaml_file, context_files)
+    change_working_dir = partial(os.path.join, working_dir)
+    context_data = map(load_yaml_file, map(change_working_dir, context_files))
 
     overriden_vars = parse_overriden_vars(overriden_vars)
     context = merge_dicts(context_data + overriden_vars)
@@ -86,6 +88,8 @@ def run(verbose, template_dir, should_apply, context_files, overriden_vars, temp
     if template_url is not None:
         template_dir = os.path.join(expanduser("~"), '.kube-render/templates')
         update_templates(template_url, template_dir)
+    else:
+        template_dir = change_working_dir(template_dir)
 
     rendered_templates = render_templates(template_dir, working_dir, **context)
 
