@@ -1,10 +1,10 @@
-from functools import partial
 import unittest
+from functools import partial
 
 import yaml
 from dpath.util import get as get_value
-
 from kuberender import render
+
 
 class KubeRenderTestCase(unittest.TestCase):
 
@@ -21,7 +21,6 @@ class KubeRenderTestCase(unittest.TestCase):
     def _load_template_manifest(self, rendered_templates):
         assert 1 == len(rendered_templates)
         return yaml.load(rendered_templates[0].content)
-
 
     def test_merging_context_values(self):
         context_files = ('base.yaml',)
