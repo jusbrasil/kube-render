@@ -1,4 +1,3 @@
-import dpath
 import yaml
 
 
@@ -8,13 +7,6 @@ def load_yaml_file(path):
 
 
 def merge_dicts(dicts):
-    merged = {}
-    for d in dicts:
-        dpath.util.merge(merged, d)
-    return merged
-
-
-def merge_dicts_v2(dicts):
     merged = {}
     for d in dicts:
         merged = deep_merge(merged, d, always_concat_list=True)
