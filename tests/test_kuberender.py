@@ -3,7 +3,7 @@ from functools import partial
 
 import yaml
 from dpath.util import get as get_value
-from kuberender import render
+from kuberender.render import render
 
 
 class KubeRenderTestCase(unittest.TestCase):
