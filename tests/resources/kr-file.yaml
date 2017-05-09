@@ -1,0 +1,14 @@
+base:
+  verbose: true
+  context_files: 
+  - base.yaml
+  template-dir: templates
+  should-apply: false
+renders:
+- overriden-vars:
+    kind: app1
+- context_files:
+  - extended.yaml
+  overriden-vars:
+    kind: app2
+  verbose: false

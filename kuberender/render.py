@@ -10,14 +10,9 @@ import jinja2
 import yaml
 from libvcs.shortcuts import create_repo_from_pip_url
 
+from .utils import load_yaml_file, merge_dicts
+
 RenderedTemplate = collections.namedtuple('RenderedTemplate', ['slug', 'content'])
-
-
-def merge_dicts(dicts):
-    merged = {}
-    for d in dicts:
-        dpath.util.merge(merged, d)
-    return merged
 
 
 def should_render_template(template_path):
@@ -38,11 +33,6 @@ def render_templates(template_dir, working_dir, **context):
     return map(render, filter(should_render_template, os.listdir(template_dir)))
 
 
-def load_yaml_file(path):
-    with open(path) as f:
-        return yaml.load(f.read())
-
-
 def parse_overriden_vars(overriden_vars):
     def parse_statement(override_statement):
         key, value = override_statement.split('=')
@@ -50,6 +40,8 @@ def parse_overriden_vars(overriden_vars):
         dpath.util.new(obj, key, value, separator='.')
         return obj
 
+    if isinstance(overriden_vars, dict):
+        return [overriden_vars]
     return list(map(parse_statement, overriden_vars))
 
 
@@ -100,7 +92,9 @@ def apply_templates(rendered_templates):
     return map(call_kubectl_apply, rendered_templates)
 
 
-def run(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir):
+def run(verbose=False, template_dir='templates', should_apply=False, context_files=None, overriden_vars=None, template_url=None, working_dir='.'):
+    context_files = context_files or []
+    overriden_vars = overriden_vars or {}
     return_code = 0
     rendered_templates = render(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir)
     if should_apply:

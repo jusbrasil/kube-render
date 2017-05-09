@@ -1,4 +1,5 @@
 from kuberender import render
+from kuberender import file
 import click
 
 
@@ -12,4 +13,12 @@ import click
 @click.option('--working-dir', '-w', default='.', help="Base directory for loading templates and context files")
 def cli_render(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir):
     return_code = render.run(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir)
+    exit(return_code)
+
+
+@click.command()
+@click.option('--verbose', '-v', default=False, is_flag=True, help='Whether it should print generated files or not')
+@click.argument('filename')
+def cli_file(verbose, filename):
+    return_code = file.run(filename, verbose)
     exit(return_code)

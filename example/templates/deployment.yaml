@@ -1,5 +1,5 @@
 {% if kind %}
-Kind: {{ kind }}
+kind: {{ kind }}
 {% endif %}
 a: {{ root.something.a }}
 b: {{ root.something.b }}
