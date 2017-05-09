@@ -1,9 +1,9 @@
 import collections
 import os
-from os.path import expanduser
 import sys
-from subprocess import Popen, PIPE
 from functools import partial
+from os.path import expanduser
+from subprocess import PIPE, Popen
 
 import dpath
 import jinja2
@@ -99,3 +99,10 @@ def call_kubectl_apply(template):
 def apply_templates(rendered_templates):
     return map(call_kubectl_apply, rendered_templates)
 
+
+def run(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir):
+    return_code = 0
+    rendered_templates = render(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir)
+    if should_apply:
+        return_code = all(apply_templates(rendered_templates))
+    return return_code

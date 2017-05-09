@@ -11,8 +11,5 @@ import click
 @click.option('--apply', '-A', 'should_apply', default=False, is_flag=True, help="Apply rendered files using `kubectl apply`")
 @click.option('--working-dir', '-w', default='.', help="Base directory for loading templates and context files")
 def cli_render(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir):
-    status_code = 0
-    rendered_templates = render.render(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir)
-    if should_apply:
-        status_code = all(render.apply_templates(rendered_templates))
-    exit(status_code)
+    return_code = render.run(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir)
+    exit(return_code)
