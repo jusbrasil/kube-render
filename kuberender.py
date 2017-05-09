@@ -69,6 +69,7 @@ def update_templates(template_url, dump_dir):
     repo = create_repo_from_pip_url(pip_url=template_url, repo_dir=dump_dir)
     repo.update_repo()
 
+
 def render(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir):
     change_working_dir = partial(os.path.join, working_dir)
     context_data = map(load_yaml_file, map(change_working_dir, context_files))
