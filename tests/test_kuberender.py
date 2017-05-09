@@ -56,3 +56,7 @@ class KubeRenderTestCase(unittest.TestCase):
         # Image and tag were overriden but pullPolicy (which is a sibling) wasn't modified
         assert 'bitnami/redis:3.0.7' == get_value(manifest, 'spec/template/spec/containers/0/image')
         assert 'Always' == get_value(manifest, 'spec/template/spec/containers/0/imagePullPolicy')
+
+
+if __name__ == '__main__':
+    unittest.main()
