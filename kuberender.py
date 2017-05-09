@@ -54,17 +54,6 @@ def parse_overriden_vars(overriden_vars):
     return list(map(parse_statement, overriden_vars))
 
 
-def create_kubectl_apply_pipe():
-    return Popen(['kubectl', 'apply', '-f', '-'], stdin=PIPE)
-
-
-def call_kubectl_apply(template):
-    if not (yaml.load(template.content) or {}).get('kind'):
-        return
-    pipe = create_kubectl_apply_pipe()
-    pipe.communicate(template.content)
-
-
 def update_templates(template_url, dump_dir):
     repo = create_repo_from_pip_url(pip_url=template_url, repo_dir=dump_dir)
     repo.update_repo()
@@ -93,9 +82,23 @@ def render(verbose, template_dir, should_apply, context_files, overriden_vars, t
             sys.stdout.write(t.content)
             sys.stdout.write('\n')
 
-    if should_apply:
-        map(call_kubectl_apply, rendered_templates)
     return rendered_templates
+
+
+def create_kubectl_apply_pipe():
+    return Popen(['kubectl', 'apply', '-f', '-'], stdin=PIPE)
+
+
+def call_kubectl_apply(template):
+    if not (yaml.load(template.content) or {}).get('kind'):
+        return
+    pipe = create_kubectl_apply_pipe()
+    pipe.communicate(template.content)
+    return pipe.wait()
+
+
+def apply_templates(rendered_templates):
+    return map(call_kubectl_apply, rendered_templates)
 
 
 @click.command()
@@ -107,4 +110,8 @@ def render(verbose, template_dir, should_apply, context_files, overriden_vars, t
 @click.option('--apply', '-A', 'should_apply', default=False, is_flag=True, help="Apply rendered files using `kubectl apply`")
 @click.option('--working-dir', '-w', default='.', help="Base directory for loading templates and context files")
 def run(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir):
-    return render(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir)
+    status_code = 0
+    rendered_templates = render(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir)
+    if should_apply:
+        status_code = all(apply_templates(rendered_templates))
+    exit(status_code)
