@@ -2,7 +2,6 @@ import collections
 import os
 import sys
 from functools import partial
-from os.path import expanduser
 from subprocess import PIPE, Popen
 
 import dpath
@@ -10,7 +9,7 @@ import jinja2
 import yaml
 from libvcs.shortcuts import create_repo_from_pip_url
 
-from .utils import load_yaml_file, merge_dicts
+from .utils import load_yaml_file, create_template_dir, merge_dicts
 
 RenderedTemplate = collections.namedtuple('RenderedTemplate', ['slug', 'content'])
 
@@ -58,7 +57,7 @@ def render(verbose, template_dir, should_apply, context_files, overriden_vars, t
     context = merge_dicts(context_data + overriden_vars)
 
     if template_url is not None:
-        template_dir = os.path.join(expanduser("~"), '.kube-render/templates')
+        template_dir = create_template_dir(template_url)
         update_templates(template_url, template_dir)
     else:
         template_dir = change_working_dir(template_dir)
