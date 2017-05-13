@@ -1,7 +1,7 @@
-import yaml
-import os
-from os.path import expanduser
+from os.path import expanduser, join
 from urlparse import urlparse
+
+import yaml
 
 
 def load_yaml_file(path):
@@ -38,6 +38,11 @@ def deep_merge(lhs, rhs, always_concat_list=False):
 
 
 def create_template_dir(repo_url):
-    path = urlparse(repo_url).path[1:]
-    template_dir = os.path.join(expanduser("~"), '.kube-render/templates', path)
+    parse_result = urlparse(repo_url)
+    result_path = parse_result.path
+    if parse_result.netloc:
+        path = result_path[1:]
+    else:
+        path = result_path.split(":")[1]
+    template_dir = join(expanduser("~"), '.kube-render/templates', path)
     return template_dir
