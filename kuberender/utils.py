@@ -37,7 +37,7 @@ def deep_merge(lhs, rhs, always_concat_list=False):
     return dict(pairs)
 
 
-def create_template_dir(repo_url):
+def make_template_path(repo_url):
     parse_result = urlparse(repo_url)
     result_path = parse_result.path
     if parse_result.netloc:
