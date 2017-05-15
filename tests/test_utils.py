@@ -32,13 +32,15 @@ def test_dpath_merge_side_effect_bug():
 
 
 def test_create_template_dir():
+    user_home = expanduser("~")
+
     dir1 = make_template_path("git+ssh://git@github.com/jusbrasil/kube-templates.git"
                                "@e0f515433973a0a3bd49f6baa7d47da1bf092728")
-    dir2 = make_template_path("git+https://github.com/jusbrasil/somerepo.git")
-    dir3 = make_template_path("git+git@bitbucket.org:jusbrasil/templates.git@mybranch")
-
-    user_home = expanduser("~")
     assert dir1 == user_home + "/.kube-render/templates/jusbrasil/kube-templates.git" \
                                "@e0f515433973a0a3bd49f6baa7d47da1bf092728"
+
+    dir2 = make_template_path("git+https://github.com/jusbrasil/somerepo.git")
     assert dir2 == user_home + "/.kube-render/templates/jusbrasil/somerepo.git"
+
+    dir3 = make_template_path("git+git@bitbucket.org:jusbrasil/templates.git@mybranch")
     assert dir3 == user_home + "/.kube-render/templates/jusbrasil/templates.git@mybranch"
