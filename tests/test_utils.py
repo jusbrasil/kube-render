@@ -31,7 +31,7 @@ def test_dpath_merge_side_effect_bug():
     assert dst2["l"] == [1]
 
 
-def test_create_template_dir():
+def test_make_template_path():
     user_home = expanduser("~")
 
     dir1 = make_template_path("git+ssh://git@github.com/jusbrasil/kube-templates.git"
