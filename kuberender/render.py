@@ -2,7 +2,7 @@ import collections
 import os
 import sys
 from functools import partial
-from subprocess import PIPE, Popen
+import subprocess
 
 import dpath
 import jinja2
@@ -71,20 +71,22 @@ def render(verbose, template_dir, should_apply, context_files, overriden_vars, t
             sys.stdout.write('\n### Rendered {}\n'.format(t.slug))
             sys.stdout.write(t.content)
             sys.stdout.write('\n')
-
     return rendered_templates
 
 
 def create_kubectl_apply_pipe():
-    return Popen(['kubectl', 'apply', '-f', '-'], stdin=PIPE)
+    return subprocess.Popen(['kubectl', 'apply', '-f', '-'], stdin=subprocess.PIPE)
 
 
 def call_kubectl_apply(template):
-    if not (yaml.load(template.content) or {}).get('kind'):
-        return
-    pipe = create_kubectl_apply_pipe()
-    pipe.communicate(template.content)
-    return pipe.wait()
+    def apply_template(content):
+        if not content.get('kind'):
+            return 1
+        pipe = create_kubectl_apply_pipe()
+        str_content = yaml.safe_dump(content, default_flow_style=False, indent=2)
+        pipe.communicate(str_content)
+        return pipe.wait()
+    return all(map(apply_template, yaml.load_all(template.content)))
 
 
 def apply_templates(rendered_templates):

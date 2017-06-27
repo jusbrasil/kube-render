@@ -3,16 +3,18 @@ from functools import partial
 
 import yaml
 from dpath.util import get as get_value
-from kuberender.render import render
+from mock import patch, Mock
+
+from kuberender.render import render, run
 
 
 class KubeRenderTestCase(unittest.TestCase):
 
-    def _partial_render(self):
+    def _partial_render(self, template_folder='test-basic-manifest'):
         return partial(
             render,
             verbose=False,
-            template_dir='templates',
+            template_dir=template_folder,
             should_apply=False,
             working_dir='tests/resources',
             template_url=None,
@@ -21,6 +23,26 @@ class KubeRenderTestCase(unittest.TestCase):
     def _load_template_manifest(self, rendered_templates):
         assert 1 == len(rendered_templates)
         return yaml.load(rendered_templates[0].content)
+
+    @patch('subprocess.Popen')
+    def test_applying_multiple_deploy_in_same_file(self, popen_mock):
+        context_files = ('base.yaml', 'extended.yaml')
+
+        popen_mock.side_effect = processes = [Mock(), Mock()]
+        run(
+            template_dir='test-multi-file-manifest',
+            should_apply=True,
+            context_files=context_files,
+            working_dir='tests/resources'
+        )
+
+        assert popen_mock.call_count == 2
+
+        first_deploy_content = yaml.load(processes[0].communicate.call_args[0][0])
+        assert first_deploy_content['metadata']['name'] == 'redis-news-page-cache'
+
+        second_deploy_content = yaml.load(processes[1].communicate.call_args[0][0])
+        assert second_deploy_content['metadata']['name'] == 'redis-news-page-cache-2'
 
     def test_merging_context_values(self):
         context_files = ('base.yaml',)
