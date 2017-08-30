@@ -11,9 +11,15 @@ def fix_keys(d):
 
 def configure_working_dir(filename, base_config):
     dirname = path.dirname(filename)
+    if not dirname:
+        dirname = '.'
     base_config['working-dir'] = dirname
     return base_config
 
+def ensure_apply_by_default(parameters):
+    if 'should_apply' not in parameters:
+        parameters['should_apply'] = True
+    return parameters
 
 def run(filename, verbose=False):
     content = load_yaml_file(filename)
@@ -24,8 +30,11 @@ def run(filename, verbose=False):
     for r in all_renders:
         parameters = merge_dicts([dict(base_config), r])
         parameters = fix_keys(parameters)
+        parameters = ensure_apply_by_default(parameters)
         if verbose:
+            parameters['verbose'] = True
             sys.stdout.write('\n\n### RENDERING FIRST ###\n')
+            sys.stdout.write(str(parameters) + '\n')
         return_code = render.run(**parameters)
         return_codes.add(return_code)
     return all(return_codes)
