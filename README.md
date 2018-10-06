@@ -1,5 +1,8 @@
 ## Kube-render
 
+.. image:: https://secure.travis-ci.org/jusbrasil/kube-render.svg?branch=master
+   :target: http://travis-ci.org/jusbrasil/kube-render
+
 A tool for rendering Kubernetes (k8s) templates into Manifests.
 It supports most of [Helm](https://github.com/kubernetes/helm) rendering features.
 
