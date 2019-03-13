@@ -54,7 +54,7 @@ def render(verbose, template_dir, should_apply, context_files, overriden_vars, t
     context_data = map(load_yaml_file, map(change_working_dir, context_files))
 
     overriden_vars = parse_overriden_vars(overriden_vars)
-    context = merge_dicts(context_data + overriden_vars)
+    context = merge_dicts(list(context_data) + list(overriden_vars))
 
     if template_url is not None:
         template_dir = make_template_path(template_url)

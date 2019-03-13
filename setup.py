@@ -12,7 +12,8 @@ setup(
         'click==6.7',
         'PyYAML==3.13',
         'dpath==1.4.0',
-        'libvcs==0.2.3',
+        'libvcs==0.3.0',
+        'six==1.12.0',
     ],
     entry_points={
         'console_scripts': [
