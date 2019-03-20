@@ -75,7 +75,8 @@ def render(verbose, template_dir, should_apply, context_files, overriden_vars, t
 
 
 def create_kubectl_apply_pipe():
-    return subprocess.Popen(['kubectl', 'apply', '-f', '-'], stdin=subprocess.PIPE)
+    return subprocess.Popen(['kubectl', 'apply', '-f', '-'],
+                            stdin=subprocess.PIPE, encoding='utf-8')
 
 
 def call_kubectl_apply(template):
