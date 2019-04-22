@@ -75,8 +75,13 @@ def render(verbose, template_dir, should_apply, context_files, overriden_vars, t
 
 
 def create_kubectl_apply_pipe():
-    return subprocess.Popen(['kubectl', 'apply', '-f', '-'],
-                            stdin=subprocess.PIPE, encoding='utf-8')
+    return subprocess.Popen(
+        ['kubectl', 'apply', '-f', '-'],
+        stdin=subprocess.PIPE,
+        stdout=sys.stdout,
+        stderr=sys.stderr,
+        encoding='utf-8'
+    )
 
 
 def call_kubectl_apply(template):
@@ -85,9 +90,9 @@ def call_kubectl_apply(template):
             return 1
         pipe = create_kubectl_apply_pipe()
         str_content = yaml.safe_dump(content, default_flow_style=False, indent=2)
-        pipe.communicate(str_content)
-        return pipe.wait()
-    return all(map(apply_template, yaml.load_all(template.content)))
+        _stdout, stderr = pipe.communicate(str_content)
+        return 1 if stderr else 0
+    return all((apply_template(c) for c in yaml.load_all(template.content)))
 
 
 def apply_templates(rendered_templates):
