@@ -10,7 +10,7 @@ from kuberender.render import render, run
 
 class KubeRenderTestCase(unittest.TestCase):
 
-    def _pipe_mocK(self, returncode=0):
+    def _pipe_mock(self, returncode=0):
         pipe = Mock()
         pipe.wait.return_value = returncode
         return pipe
@@ -33,7 +33,7 @@ class KubeRenderTestCase(unittest.TestCase):
     def test_applying_multiple_deploy_in_same_file(self, popen_mock):
         context_files = ('base.yaml', 'extended.yaml')
 
-        popen_mock.side_effect = processes = [self._pipe_mocK(), self._pipe_mocK()]
+        popen_mock.side_effect = processes = [self._pipe_mock(), self._pipe_mock()]
         assert run(
             template_dir='test-multi-file-manifest',
             should_apply=True,
@@ -53,7 +53,7 @@ class KubeRenderTestCase(unittest.TestCase):
     def test_return_first_non_zero_exit_code_on_failure(self, popen_mock):
         context_files = ('base.yaml', 'extended.yaml')
 
-        popen_mock.side_effect = processes = [self._pipe_mocK(1), self._pipe_mocK()]
+        popen_mock.side_effect = processes = [self._pipe_mock(1), self._pipe_mock()]
         assert run(
             template_dir='test-multi-file-manifest',
             should_apply=True,
