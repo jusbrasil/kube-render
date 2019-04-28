@@ -16,17 +16,18 @@ def configure_working_dir(filename, base_config):
     base_config['working-dir'] = dirname
     return base_config
 
+
 def ensure_apply_by_default(parameters):
     if 'should_apply' not in parameters:
         parameters['should_apply'] = True
     return parameters
+
 
 def run(filename, verbose=False):
     content = load_yaml_file(filename)
     base_config = content.get('base', {})
     base_config = configure_working_dir(filename, base_config)
     all_renders = content.get('renders', [])
-    return_codes = set()
     for r in all_renders:
         parameters = merge_dicts([dict(base_config), r])
         parameters = fix_keys(parameters)
@@ -36,5 +37,6 @@ def run(filename, verbose=False):
             sys.stdout.write('\n\n### RENDERING FIRST ###\n')
             sys.stdout.write(str(parameters) + '\n')
         return_code = render.run(**parameters)
-        return_codes.add(return_code)
-    return all(return_codes)
+        if return_code != 0:
+            return return_code
+    return 0

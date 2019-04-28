@@ -10,6 +10,11 @@ from kuberender.render import render, run
 
 class KubeRenderTestCase(unittest.TestCase):
 
+    def _pipe_mock(self, returncode=0):
+        pipe = Mock()
+        pipe.wait.return_value = returncode
+        return pipe
+
     def _partial_render(self, template_folder='test-basic-manifest'):
         return partial(
             render,
@@ -28,13 +33,13 @@ class KubeRenderTestCase(unittest.TestCase):
     def test_applying_multiple_deploy_in_same_file(self, popen_mock):
         context_files = ('base.yaml', 'extended.yaml')
 
-        popen_mock.side_effect = processes = [Mock(), Mock()]
-        run(
+        popen_mock.side_effect = processes = [self._pipe_mock(), self._pipe_mock()]
+        assert run(
             template_dir='test-multi-file-manifest',
             should_apply=True,
             context_files=context_files,
             working_dir='tests/resources'
-        )
+        ) == 0
 
         assert popen_mock.call_count == 2
 
@@ -43,6 +48,23 @@ class KubeRenderTestCase(unittest.TestCase):
 
         second_deploy_content = yaml.load(processes[1].communicate.call_args[0][0])
         assert second_deploy_content['metadata']['name'] == 'redis-news-page-cache-2'
+
+    @patch('subprocess.Popen')
+    def test_return_first_non_zero_exit_code_on_failure(self, popen_mock):
+        context_files = ('base.yaml', 'extended.yaml')
+
+        popen_mock.side_effect = processes = [self._pipe_mock(1), self._pipe_mock()]
+        assert run(
+            template_dir='test-multi-file-manifest',
+            should_apply=True,
+            context_files=context_files,
+            working_dir='tests/resources'
+        ) == 1
+
+        assert popen_mock.call_count == 1
+
+        first_deploy_content = yaml.load(processes[0].communicate.call_args[0][0])
+        assert first_deploy_content['metadata']['name'] == 'redis-news-page-cache'
 
     def test_merging_context_values(self):
         context_files = ('base.yaml',)

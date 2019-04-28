@@ -1,8 +1,9 @@
 import collections
 import os
+import subprocess
 import sys
 from functools import partial
-import subprocess
+from subprocess import CalledProcessError
 
 import dpath
 import jinja2
@@ -75,23 +76,24 @@ def render(verbose, template_dir, should_apply, context_files, overriden_vars, t
 
 
 def create_kubectl_apply_pipe():
-    return subprocess.Popen(['kubectl', 'apply', '-f', '-'],
-                            stdin=subprocess.PIPE, encoding='utf-8')
+    return subprocess.Popen(['kubectl', 'apply', '-f', '-'], stdin=subprocess.PIPE, encoding='utf-8')
 
 
 def call_kubectl_apply(template):
     def apply_template(content):
-        if not content.get('kind'):
-            return 1
         pipe = create_kubectl_apply_pipe()
         str_content = yaml.safe_dump(content, default_flow_style=False, indent=2)
         pipe.communicate(str_content)
-        return pipe.wait()
-    return all(map(apply_template, yaml.load_all(template.content)))
+        return_code = abs(pipe.wait())
+        if return_code != 0:
+            raise CalledProcessError(return_code, pipe.args)
+        return return_code
+
+    return max(map(apply_template, yaml.load_all(template.content)))
 
 
 def apply_templates(rendered_templates):
-    return map(call_kubectl_apply, rendered_templates)
+    return max(map(call_kubectl_apply, rendered_templates))
 
 
 def run(verbose=False, template_dir='templates', should_apply=False, context_files=None, overriden_vars=None, template_url=None, working_dir='.'):
@@ -100,5 +102,8 @@ def run(verbose=False, template_dir='templates', should_apply=False, context_fil
     return_code = 0
     rendered_templates = render(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir)
     if should_apply:
-        return_code = all(apply_templates(rendered_templates))
+        try:
+            return_code = apply_templates(rendered_templates)
+        except CalledProcessError as e:
+            return_code = e.returncode
     return return_code
