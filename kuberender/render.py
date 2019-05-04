@@ -87,13 +87,11 @@ def call_kubectl_apply(template):
         return_code = abs(pipe.wait())
         if return_code != 0:
             raise CalledProcessError(return_code, pipe.args)
-        return return_code
-
-    return max(map(apply_template, yaml.load_all(template.content)))
+    map(apply_template, yaml.load_all(template.content))
 
 
 def apply_templates(rendered_templates):
-    return max(map(call_kubectl_apply, rendered_templates))
+    map(call_kubectl_apply, rendered_templates)
 
 
 def run(verbose=False, template_dir='templates', should_apply=False, context_files=None, overriden_vars=None, template_url=None, working_dir='.'):
@@ -103,7 +101,7 @@ def run(verbose=False, template_dir='templates', should_apply=False, context_fil
     rendered_templates = render(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir)
     if should_apply:
         try:
-            return_code = apply_templates(rendered_templates)
+            apply_templates(rendered_templates)
         except CalledProcessError as e:
             return_code = e.returncode
     return return_code

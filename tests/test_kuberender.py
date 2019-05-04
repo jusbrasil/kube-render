@@ -66,6 +66,20 @@ class KubeRenderTestCase(unittest.TestCase):
         first_deploy_content = yaml.load(processes[0].communicate.call_args[0][0])
         assert first_deploy_content['metadata']['name'] == 'redis-news-page-cache'
 
+    @patch('subprocess.Popen')
+    def test_applying_empty_dir_template(self, popen_mock):
+        context_files = ('base.yaml', 'extended.yaml')
+
+        popen_mock.side_effect = []
+        assert run(
+            template_dir='test-empty-dir',
+            should_apply=True,
+            context_files=context_files,
+            working_dir='tests/resources'
+        ) == 0
+
+        assert popen_mock.call_count == 0
+
     def test_merging_context_values(self):
         context_files = ('base.yaml',)
         manifest = self._load_template_manifest(self._partial_render()(
