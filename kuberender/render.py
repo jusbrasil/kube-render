@@ -30,7 +30,7 @@ def render_templates(template_dir, working_dir, **context):
 
         rendered = template.render(yaml=yaml, **context)
         return RenderedTemplate(filename, rendered)
-    return map(render, filter(should_render_template, os.listdir(template_dir)))
+    return [render(t) for t in os.listdir(template_dir) if should_render_template(t)]
 
 
 def parse_overriden_vars(overriden_vars):
@@ -88,8 +88,8 @@ def call_kubectl_apply(template):
     def apply_template(content):
         pipe = create_kubectl_apply_pipe()
         str_content = yaml.safe_dump(content, default_flow_style=False, indent=2)
-        output, _ = pipe.communicate(str_content)
-        sys.stdout.write(output)
+        output, _ = pipe.communicate(str_content.encode())
+        sys.stdout.write(output.decode())
         return_code = abs(pipe.wait())
         if return_code != 0:
             raise CalledProcessError(return_code, pipe.args)
