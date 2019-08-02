@@ -30,7 +30,7 @@ def render_templates(template_dir, working_dir, **context):
 
         rendered = template.render(yaml=yaml, **context)
         return RenderedTemplate(filename, rendered)
-    return list(map(render, filter(should_render_template, os.listdir(template_dir))))
+    return [render(t) for t in os.listdir(template_dir) if should_render_template(t)]
 
 
 def parse_overriden_vars(overriden_vars):
