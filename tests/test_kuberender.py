@@ -12,7 +12,7 @@ class KubeRenderTestCase(unittest.TestCase):
 
     def _pipe_mock(self, returncode=0):
         pipe = Mock()
-        pipe.communicate.return_value = ('output', None)
+        pipe.communicate.return_value = (b'output', None)
         pipe.wait.return_value = returncode
         return pipe
 
@@ -27,7 +27,6 @@ class KubeRenderTestCase(unittest.TestCase):
         )
 
     def _load_template_manifest(self, rendered_templates):
-        rendered_templates = list(rendered_templates)
         assert 1 == len(rendered_templates)
         return yaml.load(rendered_templates[0].content)
 
