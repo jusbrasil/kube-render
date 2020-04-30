@@ -14,7 +14,8 @@ setup(
         'dpath==1.4.0',
         'libvcs==0.3.0',
         'six==1.12.0',
-        'zipp==0.6.0'
+        'zipp==0.6.0',
+        'MarkupSafe==1.1.1'
     ],
     entry_points={
         'console_scripts': [
