@@ -6,6 +6,7 @@ from dpath.util import get as get_value
 from mock import patch, Mock
 
 from kuberender.render import render, run
+from kuberender.utils import load_yaml_file
 
 
 class KubeRenderTestCase(unittest.TestCase):
@@ -49,6 +50,19 @@ class KubeRenderTestCase(unittest.TestCase):
 
         second_deploy_content = yaml.load(processes[1].communicate.call_args[0][0])
         assert second_deploy_content['metadata']['name'] == 'redis-news-page-cache-2'
+
+    def test_generate_files(self):
+        context_files = ('base.yaml', 'extended.yaml')
+
+        assert run(
+            template_dir='test-basic-manifest',
+            generate_files=True,
+            context_files=context_files,
+            working_dir='tests/resources'
+        ) == 0
+
+        deploy_content = load_yaml_file('generated/deployment.yaml')
+        assert deploy_content['metadata']['name'] == 'redis-news-page-cache'
 
     @patch('subprocess.Popen')
     def test_return_first_non_zero_exit_code_on_failure(self, popen_mock):
