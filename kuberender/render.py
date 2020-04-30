@@ -110,7 +110,7 @@ def save_template(template, generated_dir):
 
 def save_generated_templates(rendered_templates, generated_dir):
     if not os.path.exists(generated_dir):
-        os.mkdir(generated_dir)
+        os.makedirs(generated_dir)
     for t in rendered_templates:
         save_template(t, generated_dir)
 
