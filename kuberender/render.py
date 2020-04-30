@@ -102,7 +102,21 @@ def apply_templates(rendered_templates):
         call_kubectl_apply(t)
 
 
-def run(verbose=False, template_dir='templates', should_apply=False, context_files=None, overriden_vars=None, template_url=None, working_dir='.'):
+def save_template(template, generated_dir):
+    path = '%s/%s' % (generated_dir, template.slug)
+    with open(path, 'w') as f:
+        f.write(template.content)
+
+
+def save_generated_templates(rendered_templates, generated_dir):
+    if not os.path.exists(generated_dir):
+        os.mkdir(generated_dir)
+    for t in rendered_templates:
+        save_template(t, generated_dir)
+
+
+def run(verbose=False, template_dir='templates', should_apply=False, context_files=None, overriden_vars=None, 
+    template_url=None, working_dir='.', generate_files=False, generated_dir='./generated'):
     context_files = context_files or []
     overriden_vars = overriden_vars or {}
     return_code = 0
@@ -112,4 +126,7 @@ def run(verbose=False, template_dir='templates', should_apply=False, context_fil
             apply_templates(rendered_templates)
         except CalledProcessError as e:
             return_code = e.returncode
+    if generate_files:
+        save_generated_templates(rendered_templates, generated_dir)
+
     return return_code

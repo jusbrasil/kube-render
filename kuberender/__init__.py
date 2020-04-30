@@ -11,8 +11,10 @@ import click
 @click.option('--template-url', '-u', default=None, help='URL to download templates from (writes on ~/.kube-render/templates). Accepts URLs on pip format')
 @click.option('--apply', '-A', 'should_apply', default=False, is_flag=True, help="Apply rendered files using `kubectl apply`")
 @click.option('--working-dir', '-w', default='.', help="Base directory for loading templates and context files")
-def cli_render(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir):
-    return_code = render.run(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir)
+@click.option('--generate', '-g', 'generate_files', default=False, is_flag=True, help="Generate files for each template")
+@click.option('--generated-dir', '-G', default='./generated', help="Directory for generated templates")
+def cli_render(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir, generate_files, generated_dir):
+    return_code = render.run(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir, generate_files, generated_dir)
     exit(return_code)
 
 
