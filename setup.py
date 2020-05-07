@@ -8,7 +8,7 @@ setup(
     packages=['kuberender'],
     description='A tool to render and apply Kubernetes manifests using Jinja2',
     install_requires=[
-        'Jinja2==2.9.6',
+        'Jinja2 >= 2.9.6, <=2.10.3',
         'click==6.7',
         'PyYAML==5.1',
         'dpath==1.4.0',
