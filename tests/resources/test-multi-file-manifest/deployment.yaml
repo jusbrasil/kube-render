@@ -1,5 +1,5 @@
 {% set NAME = 'redis-' + instance_name -%}
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ NAME }}
@@ -23,7 +23,7 @@ spec:
             memory: "{{resources.limits.memory}}"
             cpu: {{resources.limits.cpu}}
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ "{}-2".format(NAME) }}
