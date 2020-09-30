@@ -1,5 +1,5 @@
 {% set NAME = 'redis-' + instance_name -%}
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ NAME }}
@@ -8,6 +8,10 @@ metadata:
     service: redis
 spec:
   replicas: 1
+  selector:
+    labels:
+      name: {{ APP_NAME }}
+      service: redis
   template:
     metadata:
       labels:

@@ -52,7 +52,7 @@ resources:
     memory: 64M
 
 ### Rendered deployment.yaml
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: redis-news-page-cache
@@ -61,6 +61,10 @@ metadata:
     service: redis
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      name:
+      service: redis
   template:
     metadata:
       labels:
