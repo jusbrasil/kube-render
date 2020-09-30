@@ -8,6 +8,10 @@ metadata:
     service: redis
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      name: {{ APP_NAME }}
+      service: redis
   template:
     metadata:
       labels:
@@ -32,6 +36,10 @@ metadata:
     service: redis
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      name: {{ APP_NAME }}
+      service: redis
   template:
     metadata:
       labels:

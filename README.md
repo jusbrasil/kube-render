@@ -61,6 +61,10 @@ metadata:
     service: redis
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      name:
+      service: redis
   template:
     metadata:
       labels:
