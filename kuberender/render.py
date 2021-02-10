@@ -75,18 +75,18 @@ def render(verbose, template_dir, should_apply, context_files, overriden_vars, t
     return rendered_templates
 
 
-def create_kubectl_apply_pipe():
+def create_kubectl_apply_pipe(executable_name_or_path):
     return subprocess.Popen(
-        ['kubectl', 'apply', '-f', '-'],
+        [executable_name_or_path, 'apply', '-f', '-'],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT
     )
 
 
-def call_kubectl_apply(template):
-    def apply_template(content):
-        pipe = create_kubectl_apply_pipe()
+def call_kubectl_apply(template, kubectl):
+    def apply_template(content, executable_name_or_path):
+        pipe = create_kubectl_apply_pipe(executable_name_or_path)
         str_content = yaml.safe_dump(content, default_flow_style=False, indent=2)
         output, _ = pipe.communicate(str_content.encode())
         sys.stdout.write(output.decode())
@@ -94,12 +94,12 @@ def call_kubectl_apply(template):
         if return_code != 0:
             raise CalledProcessError(return_code, pipe.args)
     for t in yaml.load_all(template.content):
-        apply_template(t)
+        apply_template(t, kubectl)
 
 
-def apply_templates(rendered_templates):
+def apply_templates(rendered_templates, kubectl):
     for t in rendered_templates:
-        call_kubectl_apply(t)
+        call_kubectl_apply(t, kubectl)
 
 
 def save_template(template, generated_dir):
@@ -116,14 +116,14 @@ def save_generated_templates(rendered_templates, generated_dir):
 
 
 def run(verbose=False, template_dir='templates', should_apply=False, context_files=None, overriden_vars=None, 
-    template_url=None, working_dir='.', generate_files=False, generated_dir='./generated'):
+    template_url=None, working_dir='.', generate_files=False, generated_dir='./generated', kubectl='kubectl'):
     context_files = context_files or []
     overriden_vars = overriden_vars or {}
     return_code = 0
     rendered_templates = render(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir)
     if should_apply:
         try:
-            apply_templates(rendered_templates)
+            apply_templates(rendered_templates, kubectl)
         except CalledProcessError as e:
             return_code = e.returncode
     if generate_files:

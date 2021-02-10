@@ -13,8 +13,9 @@ import click
 @click.option('--working-dir', '-w', default='.', help="Base directory for loading templates and context files")
 @click.option('--generate-files', '-g', 'generate_files', default=False, is_flag=True, help="Generate files for each template")
 @click.option('--generated-dir', '-G', default='./generated', help="Directory for generated templates")
-def cli_render(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir, generate_files, generated_dir):
-    return_code = render.run(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir, generate_files, generated_dir)
+@click.option('--kubectl', '-K', default='kubectl', help='name or path to the kubectl executable')
+def cli_render(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir, generate_files, generated_dir, kubectl):
+    return_code = render.run(verbose, template_dir, should_apply, context_files, overriden_vars, template_url, working_dir, generate_files, generated_dir, kubectl)
     exit(return_code)
 
 
