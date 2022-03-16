@@ -12,7 +12,7 @@ setup(
         'click==6.7',
         'PyYAML==5.1',
         'dpath==1.4.0',
-        'libvcs==0.3.0',
+        'libvcs==0.11.1',
         'six==1.12.0',
         'zipp==0.6.0',
         'MarkupSafe==1.1.1'
