@@ -10,7 +10,7 @@ setup(
     install_requires=[
         'Jinja2==2.11.3',
         'click==6.7',
-        'PyYAML==5.1',
+        'PyYAML==5.4',
         'dpath==1.4.0',
         'libvcs==0.3.0',
         'six==1.12.0',
