@@ -123,12 +123,29 @@ class KubeRenderTestCase(unittest.TestCase):
 
         manifest = self._load_template_manifest(self._partial_render()(
             context_files=['base.yaml'],
-            overriden_vars=['image.tag=3.0.7', 'image.repository=bitnami/redis']
+            overriden_vars=['image.tag=3.0.7', 'image.repository=bitnami/redis', 'other.key=test=']
         ))
 
         # Image and tag were overriden but pullPolicy (which is a sibling) wasn't modified
         assert 'bitnami/redis:3.0.7' == get_value(manifest, 'spec/template/spec/containers/0/image')
         assert 'Always' == get_value(manifest, 'spec/template/spec/containers/0/imagePullPolicy')
+
+    def test_overriding_vars_with_eq(self):
+        manifest = self._load_template_manifest(self._partial_render()(
+            context_files=['base.yaml'],
+            overriden_vars=[]
+        ))
+        assert 'redis:latest' == get_value(manifest, 'spec/template/spec/containers/0/image')
+        assert 'Always' == get_value(manifest, 'spec/template/spec/containers/0/imagePullPolicy')
+
+        manifest = self._load_template_manifest(self._partial_render()(
+            context_files=['base.yaml'],
+            overriden_vars=['image.tag=3.0.7', 'image.repository=bitnami/redis', 'image.pullPolicy=test=']
+        ))
+
+        # Image and tag were overriden but pullPolicy (which is a sibling) wasn't modified
+        assert 'bitnami/redis:3.0.7' == get_value(manifest, 'spec/template/spec/containers/0/image')
+        assert 'test=' == get_value(manifest, 'spec/template/spec/containers/0/imagePullPolicy')
 
 
 if __name__ == '__main__':

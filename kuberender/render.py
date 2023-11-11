@@ -35,7 +35,9 @@ def render_templates(template_dir, working_dir, **context):
 
 def parse_overriden_vars(overriden_vars):
     def parse_statement(override_statement):
-        key, value = override_statement.split('=')
+        equal_idx = override_statement.index('=')
+        key = override_statement[:equal_idx]
+        value = override_statement[equal_idx + 1:]
         obj = {}
         dpath.util.new(obj, key, value, separator='.')
         return obj
