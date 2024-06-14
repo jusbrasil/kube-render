@@ -1,6 +1,7 @@
-## Kube-render
+**⚠ Deprecated: This tool has been deprecated in favor of [JusPipelines](https://www.notion.so/jusbrasil/Cria-o-de-um-novo-CI-CD-manifesto-para-kubernetes-atrav-s-do-Jusplatform-3d65d93d272e448c91d6bc27662a7cdc).**
 
-[![Build Status](https://travis-ci.org/jusbrasil/kube-render.svg?branch=master)](https://travis-ci.org/jusbrasil/kube-render)
+
+## Kube-render
 
 A tool for rendering Kubernetes (k8s) templates into Manifests.
 It supports most of [Helm](https://github.com/kubernetes/helm) rendering features.
