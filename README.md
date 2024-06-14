@@ -1,5 +1,7 @@
 **⚠ Deprecated: This tool has been deprecated in favor of [JusPipelines](https://www.notion.so/jusbrasil/Cria-o-de-um-novo-CI-CD-manifesto-para-kubernetes-atrav-s-do-Jusplatform-3d65d93d272e448c91d6bc27662a7cdc).**
 
+- Context: https://jusbrasil.slack.com/archives/C024ZPVMG/p1718211600700369
+
 
 ## Kube-render
 
